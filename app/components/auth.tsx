@@ -37,7 +37,7 @@ export function Auth({ children }: { children: React.ReactNode }) {
   if (loading) {
     return <div className="flex items-center justify-center h-screen text-gray-100">Loading...</div>;
   }
-  if (!user) return null;
+
   return (
     <AuthContext.Provider value={{ user, loading }}>
       {children}

@@ -64,7 +64,7 @@ export default function MeetingDetailPage() {
   };
 
   return (
-    <div className="h-[calc(100vh-4rem)] bg-background w-full px-0 py-8">
+    <div className="h-[calc(100vh-4rem)] bg-background w-full px-0 py-2">
       <Card className="w-full h-full flex flex-col">
         <CardHeader className="pb-2">
           <div className="flex flex-col gap-1 w-full">

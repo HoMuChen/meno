@@ -3,7 +3,7 @@ import { Meeting, listMeetings, addMeeting, updateMeeting, deleteMeeting } from 
 import { useAuth } from "../components/auth";
 import { Link } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/node";
-import { PlusIcon, PencilIcon, MicrophoneIcon, ArrowUpTrayIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, PencilIcon, MicrophoneIcon, ArrowUpTrayIcon, TrashIcon, EyeIcon } from "@heroicons/react/24/outline";
 import {
   Table,
   TableHeader,
@@ -179,6 +179,11 @@ export default function MeetingsRoute() {
                     </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link to={`/meetings/${meeting.id}`}>
+                              <EyeIcon className="h-4 w-4 mr-2" /> View
+                            </Link>
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => startEdit(meeting)}>
                             <PencilIcon className="h-4 w-4 mr-2" /> Edit
                           </DropdownMenuItem>

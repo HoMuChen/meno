@@ -24,6 +24,14 @@ export const links: LinksFunction = () => [
   },
 ];
 
+export function meta() {
+  return [
+    { title: "Meno - Meeting Notes App" },
+    { name: "description", content: "A modern meeting notes and recording app" },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+  ];
+}
+
 export default function App() {
   return (
     <Layout>

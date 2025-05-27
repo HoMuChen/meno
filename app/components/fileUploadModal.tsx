@@ -38,9 +38,9 @@ export function FileUploadModal({ open, onClose, onUploadSuccess, accept }: File
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-background rounded-lg p-6 w-full max-w-md shadow-lg">
-        <h2 className="text-lg font-bold mb-4">Upload File</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-background rounded-lg p-4 md:p-6 w-full max-w-sm md:max-w-md shadow-lg">
+        <h2 className="text-lg font-bold mb-4 text-center">Upload File</h2>
         <div className="flex flex-col items-center gap-4">
           <input
             ref={inputRef}
@@ -50,11 +50,11 @@ export function FileUploadModal({ open, onClose, onUploadSuccess, accept }: File
             onChange={handleFileChange}
             disabled={uploading}
           />
-          <div className="flex gap-2 mt-4">
-            <Button onClick={onClose} variant="secondary" disabled={uploading}>
+          <div className="flex gap-2 mt-4 w-full">
+            <Button onClick={onClose} variant="secondary" disabled={uploading} className="flex-1 text-sm">
               Cancel
             </Button>
-            <Button onClick={handleUpload} disabled={!file || uploading}>
+            <Button onClick={handleUpload} disabled={!file || uploading} className="flex-1 text-sm">
               {uploading ? "Uploading..." : "Upload"}
             </Button>
           </div>

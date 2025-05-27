@@ -26,20 +26,20 @@ export default function Index() {
   const handleUploadClick = () => setIsUploadModalOpen(true);
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="flex flex-col items-center gap-16">
-        <header className="flex flex-col items-center gap-9">
-          <h1 className="leading text-2xl font-bold text-gray-800 dark:text-gray-100">
+    <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4">
+      <div className="flex flex-col items-center gap-8 md:gap-16 w-full max-w-md">
+        <header className="flex flex-col items-center gap-6 md:gap-9 text-center">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">
             Welcome to Meno
           </h1>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button>
-                <PlusIcon className="h-5 w-5" />
+              <Button className="w-full sm:w-auto">
+                <PlusIcon className="h-4 w-4 md:h-5 md:w-5" />
                 New Meeting
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="center" className="w-48">
               <DropdownMenuItem onClick={handleRecordClick}>
                 <MicrophoneIcon className="h-4 w-4 mr-2" /> Record
               </DropdownMenuItem>

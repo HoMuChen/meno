@@ -15,17 +15,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <Meta />
         <Links />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body className="h-full flex bg-background text-foreground">
         <SidebarProvider>
           <AppSidebar />
           <main className="flex-1 flex flex-col min-h-screen bg-background">
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 bg-background">
+            <header className="flex h-14 md:h-16 shrink-0 items-center gap-2 border-b px-2 md:px-4 bg-background">
               <SidebarTrigger className="-ml-1" />
               <Separator orientation="vertical" className="mr-2 h-4" />
-              <DynamicBreadcrumb />
+              <div className="min-w-0 flex-1">
+                <DynamicBreadcrumb />
+              </div>
             </header>
-            <div className="flex-1 flex flex-col min-h-0 p-4">
+            <div className="flex-1 flex flex-col min-h-0 p-2 md:p-4">
               {children}
             </div>
           </main>

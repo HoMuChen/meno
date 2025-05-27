@@ -132,12 +132,12 @@ export function AudioRecorderModal({ open, onClose, onUploadSuccess }: AudioReco
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-background rounded-lg p-6 w-full max-w-md shadow-lg">
-        <h2 className="text-lg font-bold mb-4">Record Audio</h2>
-        <div className="flex flex-col items-center gap-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-background rounded-lg p-4 md:p-6 w-full max-w-sm md:max-w-md shadow-lg">
+        <h2 className="text-lg font-bold mb-4 text-center">Record Audio</h2>
+        <div className="flex flex-col items-center gap-4 md:gap-6">
           {recording && (
-            <div className="flex items-center justify-center gap-6 w-full py-8 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-blue-900/20 rounded-lg">
+            <div className="flex items-center justify-center gap-4 md:gap-6 w-full py-6 md:py-8 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-blue-900/20 rounded-lg">
               {renderSoundWave('left')}
               <div className="relative">
                 <div 
@@ -148,9 +148,9 @@ export function AudioRecorderModal({ open, onClose, onUploadSuccess }: AudioReco
                     transform: `scale(${1 + volume * 0.5})`,
                   }}
                 />
-                <div className="relative z-10 w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                <div className="relative z-10 w-12 h-12 md:w-16 md:h-16 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
                   <MicrophoneIcon 
-                    className="w-8 h-8 text-white"
+                    className="w-6 h-6 md:w-8 md:h-8 text-white"
                     style={{
                       filter: `drop-shadow(0 0 ${4 + volume * 8}px rgba(59, 130, 246, 0.8))`,
                     }}
@@ -163,15 +163,15 @@ export function AudioRecorderModal({ open, onClose, onUploadSuccess }: AudioReco
           <div className="flex gap-2 w-full">
             {!recording ? (
               <>
-                <Button onClick={startRecording} disabled={uploading} variant="default" className="flex-1">
+                <Button onClick={startRecording} disabled={uploading} variant="default" className="flex-1 text-sm">
                   Start Recording
                 </Button>
-                <Button onClick={onClose} variant="secondary" disabled={uploading} className="flex-1">
+                <Button onClick={onClose} variant="secondary" disabled={uploading} className="flex-1 text-sm">
                   Cancel
                 </Button>
               </>
             ) : (
-              <Button onClick={stopRecording} disabled={uploading} variant="destructive" className="w-full">
+              <Button onClick={stopRecording} disabled={uploading} variant="destructive" className="w-full text-sm">
                 Stop Recording
               </Button>
             )}
@@ -180,10 +180,10 @@ export function AudioRecorderModal({ open, onClose, onUploadSuccess }: AudioReco
             <>
               <audio controls src={URL.createObjectURL(audioBlob)} className="w-full" />
               <div className="flex gap-2 w-full">
-                <Button onClick={onClose} variant="secondary" disabled={uploading} className="flex-1">
+                <Button onClick={onClose} variant="secondary" disabled={uploading} className="flex-1 text-sm">
                   Cancel
                 </Button>
-                <Button onClick={handleUploadAudio} disabled={uploading} className="flex-1">
+                <Button onClick={handleUploadAudio} disabled={uploading} className="flex-1 text-sm">
                   {uploading ? "Uploading..." : "Upload"}
                 </Button>
               </div>

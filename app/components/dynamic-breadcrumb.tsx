@@ -28,29 +28,39 @@ export function DynamicBreadcrumb() {
       <BreadcrumbList>
         {pathnames.length === 0 ? (
           <BreadcrumbItem>
-            <BreadcrumbPage>Home</BreadcrumbPage>
+            <BreadcrumbPage className="text-sm md:text-base">Home</BreadcrumbPage>
           </BreadcrumbItem>
         ) : (
-          pathnames.map((segment, index) => {
-            const isLast = index === pathnames.length - 1;
-            const path = buildPath(index);
-            const title = formatPathSegment(segment);
+          <>
+            {/* Mobile: Show only current page */}
+            <BreadcrumbItem className="md:hidden">
+              <BreadcrumbPage className="text-sm truncate max-w-[200px]">
+                {formatPathSegment(pathnames[pathnames.length - 1])}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+            
+            {/* Desktop: Show full breadcrumb */}
+            {pathnames.map((segment, index) => {
+              const isLast = index === pathnames.length - 1;
+              const path = buildPath(index);
+              const title = formatPathSegment(segment);
 
-            return (
-              <Fragment key={path}>
-                <BreadcrumbItem key={path} className="hidden md:block">
-                  {isLast ? (
-                    <BreadcrumbPage>{title}</BreadcrumbPage>
-                  ) : (
-                    <>
-                      <BreadcrumbLink href={path} className="text-primary hover:text-primary/80">{title}</BreadcrumbLink>
-                    </>
-                  )}
-                </BreadcrumbItem>
-                {!isLast && <BreadcrumbSeparator />}
-              </Fragment>
-            );
-          })
+              return (
+                <Fragment key={path}>
+                  <BreadcrumbItem className="hidden md:block">
+                    {isLast ? (
+                      <BreadcrumbPage className="text-sm md:text-base">{title}</BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink href={path} className="text-primary hover:text-primary/80 text-sm md:text-base">
+                        {title}
+                      </BreadcrumbLink>
+                    )}
+                  </BreadcrumbItem>
+                  {!isLast && <BreadcrumbSeparator className="hidden md:block" />}
+                </Fragment>
+              );
+            })}
+          </>
         )}
       </BreadcrumbList>
     </Breadcrumb>

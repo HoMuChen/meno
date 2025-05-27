@@ -29,8 +29,8 @@ const items = [
 export function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarHeader>
-        <h1 className="text-2xl font-bold pl-2 text-primary">Meno</h1>
+      <SidebarHeader className="px-3 py-4">
+        <h1 className="text-xl md:text-2xl font-bold text-primary">Meno</h1>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -38,9 +38,9 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className="text-sm md:text-base">
                     <a href={item.url}>
-                      <item.icon />
+                      <item.icon className="h-4 w-4 md:h-5 md:w-5" />
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
@@ -50,11 +50,12 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="px-3 py-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <User2 /> Username
+            <SidebarMenuButton className="text-sm md:text-base">
+              <User2 className="h-4 w-4 md:h-5 md:w-5" /> 
+              <span className="truncate">Username</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

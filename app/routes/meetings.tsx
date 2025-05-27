@@ -25,6 +25,7 @@ import { FileUploadModal } from "../components/fileUploadModal";
 import { MeetingStatusChip } from "../components/meetingStatusChip";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "../components/ui/alert-dialog";
 import { Input } from "../components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 
 export const meta: MetaFunction = () => [{ title: "Meetings | Meno" }];
 
@@ -93,24 +94,99 @@ export default function MeetingsRoute() {
 
   if (!user) {
     return (
-      <div className="p-8">
-        <h1 className="text-2xl font-bold mb-6">Meetings</h1>
+      <div className="p-4 md:p-8">
+        <h1 className="text-xl md:text-2xl font-bold mb-6">Meetings</h1>
         <p className="text-gray-600">Please log in to view and manage your meetings.</p>
       </div>
     );
   }
 
+  const renderMobileCard = (meeting: Meeting) => (
+    <Card key={meeting.id} className="mb-4">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0">
+            {editingId === meeting.id ? (
+              <Input 
+                value={editTitle} 
+                onChange={e => setEditTitle(e.target.value)} 
+                className="mb-2"
+                placeholder="Meeting title"
+              />
+            ) : (
+              <CardTitle className="text-base">
+                <Link to={`/meetings/${meeting.id}`} className="text-primary hover:underline">
+                  {meeting.title}
+                </Link>
+              </CardTitle>
+            )}
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link to={`/meetings/${meeting.id}`}>
+                  <EyeIcon className="h-4 w-4 mr-2" /> View
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => startEdit(meeting)}>
+                <PencilIcon className="h-4 w-4 mr-2" /> Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setDeletingId(meeting.id)}>
+                <TrashIcon className="h-4 w-4 mr-2 text-destructive" /> Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0">
+        {editingId === meeting.id ? (
+          <div className="space-y-3">
+            <Input 
+              value={editDescription} 
+              onChange={e => setEditDescription(e.target.value)} 
+              placeholder="Meeting description"
+            />
+            <div className="flex gap-2">
+              <Button size="sm" onClick={() => saveEdit(meeting.id)} disabled={!editTitle.trim()}>
+                Save
+              </Button>
+              <Button size="sm" variant="secondary" onClick={cancelEdit}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">{meeting.description}</p>
+            <div className="flex items-center justify-between">
+              <MeetingStatusChip status={meeting.status} />
+              <span className="text-xs text-muted-foreground">
+                {new Date(meeting.created_at).toLocaleDateString()}
+              </span>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
   return (
-    <div className="container mx-auto">
-      <div className="flex justify-end items-center mb-6">
+    <div className="container mx-auto px-2 md:px-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-4">
+        <h1 className="text-xl md:text-2xl font-bold md:hidden">Meetings</h1>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button>
-              <PlusIcon className="h-5 w-5" />
+            <Button className="w-full sm:w-auto">
+              <PlusIcon className="h-4 w-4 md:h-5 md:w-5" />
               New Meeting
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem onClick={handleRecordClick}>
               <MicrophoneIcon className="h-4 w-4 mr-2" /> Record
             </DropdownMenuItem>
@@ -121,7 +197,21 @@ export default function MeetingsRoute() {
         </DropdownMenu>
       </div>
 
-      <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+      {/* Mobile Card Layout */}
+      <div className="md:hidden">
+        {meetings.length === 0 ? (
+          <Card>
+            <CardContent className="flex items-center justify-center h-24">
+              <p className="text-muted-foreground">No meetings found.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          meetings.map(renderMobileCard)
+        )}
+      </div>
+
+      {/* Desktop Table Layout */}
+      <div className="hidden md:block rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
         <Table className="min-w-full text-sm text-left">
           <TableHeader>
             <TableRow className="bg-muted/60">
@@ -250,16 +340,16 @@ export default function MeetingsRoute() {
       />
 
       <AlertDialog open={!!deletingId} onOpenChange={open => { if (!open) setDeletingId(null); }}>
-        <AlertDialogContent>
+        <AlertDialogContent className="mx-4 max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Meeting</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete this meeting? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeletingId(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deletingId && confirmDelete(deletingId)} autoFocus>Delete</AlertDialogAction>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel onClick={() => setDeletingId(null)} className="w-full sm:w-auto">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => deletingId && confirmDelete(deletingId)} autoFocus className="w-full sm:w-auto">Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -43,6 +43,26 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
   return json({ success: true });
 };
 
+const GeneratingOverlay = ({ type }: { type: 'content' | 'summary' }) => (
+  <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-lg">
+    <div className="flex items-center gap-3 mb-4">
+      <div className="flex space-x-1">
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+      </div>
+    </div>
+    <div className="text-center">
+      <p className="text-sm font-medium text-foreground mb-1">
+        Generating {type}...
+      </p>
+      <p className="text-xs text-muted-foreground">
+        AI is processing your meeting audio
+      </p>
+    </div>
+  </div>
+);
+
 export default function MeetingDetailPage() {
   const { meeting } = useLoaderData<typeof loader>();
   const fetcher = useFetcher();
@@ -51,6 +71,7 @@ export default function MeetingDetailPage() {
   const [summaryValue, setSummaryValue] = useState(meeting.summary || "");
   const contentChanged = contentValue !== meeting.content;
   const summaryChanged = summaryValue !== (meeting.summary || "");
+  const isInProgress = meeting.status === "in progress";
 
   React.useEffect(() => {
     setContentValue(meeting.content);
@@ -106,13 +127,14 @@ export default function MeetingDetailPage() {
               <TabsTrigger value="summary" className="text-sm">Summary</TabsTrigger>
             </TabsList>
             <TabsContent value="content" className="h-full">
-              <div className="flex-1 flex flex-col gap-3 md:gap-4 h-full">
+              <div className="flex-1 flex flex-col gap-3 md:gap-4 h-full relative">
+                {isInProgress && <GeneratingOverlay type="content" />}
                 <Editor value={contentValue} onChange={setContentValue} />
                 <fetcher.Form method="post" className="self-end">
                   <input type="hidden" name="content" value={contentValue} />
                   <Button
                     type="submit"
-                    disabled={contentValue === meeting.content || fetcher.state === 'submitting'}
+                    disabled={contentValue === meeting.content || fetcher.state === 'submitting' || isInProgress}
                     size="sm"
                     className="text-sm"
                   >
@@ -122,13 +144,14 @@ export default function MeetingDetailPage() {
               </div>
             </TabsContent>
             <TabsContent value="summary" className="h-full">
-              <div className="flex-1 flex flex-col gap-3 md:gap-4 h-full">
+              <div className="flex-1 flex flex-col gap-3 md:gap-4 h-full relative">
+                {isInProgress && <GeneratingOverlay type="summary" />}
                 <Editor value={summaryValue} onChange={setSummaryValue} />
                 <fetcher.Form method="post" className="self-end">
                   <input type="hidden" name="summary" value={summaryValue} />
                   <Button
                     type="submit"
-                    disabled={!summaryChanged || fetcher.state === 'submitting'}
+                    disabled={!summaryChanged || fetcher.state === 'submitting' || isInProgress}
                     size="sm"
                     className="text-sm"
                   >

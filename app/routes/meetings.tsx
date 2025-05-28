@@ -178,7 +178,6 @@ export default function MeetingsRoute() {
   return (
     <div className="container mx-auto px-2 md:px-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-4">
-        <h1 className="text-xl md:text-2xl font-bold md:hidden">Meetings</h1>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button className="w-full sm:w-auto">

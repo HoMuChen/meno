@@ -20,22 +20,36 @@ export function Auth({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let unsubscribe: any;
+    console.log("Auth effect running");
     (async () => {
-      const { auth } = await import("../firebase");
-      const { onAuthStateChanged } = await import("firebase/auth");
-      unsubscribe = onAuthStateChanged(auth, (user) => {
-        setUser(user);
+      try {
+        console.log("Importing firebase...");
+        const { auth } = await import("../firebase");
+        console.log("Importing onAuthStateChanged...");
+        const { onAuthStateChanged } = await import("firebase/auth");
+        console.log("Registering onAuthStateChanged...");
+        unsubscribe = onAuthStateChanged(auth, (user) => {
+          console.log("onAuthStateChanged fired", user);
+          setUser(user);
+          setLoading(false);
+          if (!user) {
+            navigate("/login");
+          }
+        });
+      } catch (e) {
+        console.error("Auth effect error", e);
         setLoading(false);
-        if (!user) {
-          navigate("/login");
-        }
-      });
+      }
     })();
-    return () => unsubscribe && unsubscribe();
+    return () => {
+      console.log("Auth effect cleanup");
+      unsubscribe && unsubscribe();
+    };
   }, [navigate]);
 
   if (loading) {
-    return <div className="flex items-center justify-center h-screen text-gray-100">Loading...</div>;
+    console.log("Loading...");
+    return <div className="flex items-center justify-center h-screen text-gray-200">Loading...</div>;
   }
 
   return (

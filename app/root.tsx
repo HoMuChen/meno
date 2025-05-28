@@ -35,9 +35,7 @@ export function meta() {
 export default function App() {
   return (
     <Layout>
-      <Auth>
-        <Outlet />
-      </Auth>
+      <Outlet />
     </Layout>
   );
 }

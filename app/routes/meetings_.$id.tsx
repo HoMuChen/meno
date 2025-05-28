@@ -2,7 +2,7 @@ import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData, useFetcher, useNavigate } from "@remix-run/react";
 import { getMeetingById } from "../services/meetings";
-import { ArrowDownTrayIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, ArrowPathIcon, TagIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import React from "react";
 import Editor from "../components/editor";
@@ -43,7 +43,7 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
   return json({ success: true });
 };
 
-const GeneratingOverlay = ({ type }: { type: 'content' | 'summary' }) => (
+const GeneratingOverlay = ({ type, onRefresh }: { type: 'content' | 'summary', onRefresh: () => void }) => (
   <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-lg">
     <div className="flex items-center gap-3 mb-4">
       <div className="flex space-x-1">
@@ -52,7 +52,7 @@ const GeneratingOverlay = ({ type }: { type: 'content' | 'summary' }) => (
         <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
       </div>
     </div>
-    <div className="text-center">
+    <div className="text-center mb-4">
       <p className="text-sm font-medium text-foreground mb-1">
         Generating {type}...
       </p>
@@ -60,6 +60,15 @@ const GeneratingOverlay = ({ type }: { type: 'content' | 'summary' }) => (
         AI is processing your meeting audio
       </p>
     </div>
+    <Button 
+      size="sm" 
+      variant="outline" 
+      onClick={onRefresh}
+      className="text-xs"
+    >
+      <ArrowPathIcon className="h-3 w-3 mr-1" />
+      Refresh
+    </Button>
   </div>
 );
 
@@ -92,18 +101,23 @@ export default function MeetingDetailPage() {
             <div className="flex flex-col gap-2">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <CardTitle className="text-lg md:text-xl break-words">
-                    {meeting.title}
-                  </CardTitle>
-                  <CardDescription className="mt-1 text-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
+                    <CardTitle className="text-lg md:text-xl break-words">
+                      {meeting.title}
+                    </CardTitle>
+                    {meeting.tags && meeting.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {meeting.tags.map((tag, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <CardDescription className="text-sm">
                     {meeting.description || "No description"}
                   </CardDescription>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <MeetingStatusChip status={meeting.status} />
-                  <Button size="icon" variant="ghost" onClick={handleRefresh} title="Refresh" className="h-8 w-8 md:h-10 md:w-10">
-                    <ArrowPathIcon className="h-4 w-4 md:h-5 md:w-5" />
-                  </Button>
                 </div>
               </div>
             </div>
@@ -128,7 +142,7 @@ export default function MeetingDetailPage() {
             </TabsList>
             <TabsContent value="content" className="h-full">
               <div className="flex-1 flex flex-col gap-3 md:gap-4 h-full relative">
-                {isInProgress && <GeneratingOverlay type="content" />}
+                {isInProgress && <GeneratingOverlay type="content" onRefresh={handleRefresh} />}
                 <Editor value={contentValue} onChange={setContentValue} />
                 <fetcher.Form method="post" className="self-end">
                   <input type="hidden" name="content" value={contentValue} />
@@ -145,7 +159,7 @@ export default function MeetingDetailPage() {
             </TabsContent>
             <TabsContent value="summary" className="h-full">
               <div className="flex-1 flex flex-col gap-3 md:gap-4 h-full relative">
-                {isInProgress && <GeneratingOverlay type="summary" />}
+                {isInProgress && <GeneratingOverlay type="summary" onRefresh={handleRefresh} />}
                 <Editor value={summaryValue} onChange={setSummaryValue} />
                 <fetcher.Form method="post" className="self-end">
                   <input type="hidden" name="summary" value={summaryValue} />

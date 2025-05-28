@@ -26,6 +26,8 @@ import { MeetingStatusChip } from "../components/meetingStatusChip";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "../components/ui/alert-dialog";
 import { Input } from "../components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { TagsInput } from "../components/ui/tags-input";
 
 export const meta: MetaFunction = () => [{ title: "Meetings | Meno" }];
 
@@ -36,6 +38,7 @@ export default function MeetingsRoute() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [editTags, setEditTags] = useState<string[]>([]);
   const [editStatus, setEditStatus] = useState("");
   const [editLoading, setEditLoading] = useState(false);
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
@@ -62,19 +65,26 @@ export default function MeetingsRoute() {
     setEditingId(meeting.id);
     setEditTitle(meeting.title);
     setEditDescription(meeting.description);
+    setEditTags(meeting.tags || []);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
     setEditTitle("");
     setEditDescription("");
+    setEditTags([]);
   };
 
   const saveEdit = async (id: string) => {
-    await updateMeeting(id, { title: editTitle, description: editDescription });
+    await updateMeeting(id, { 
+      title: editTitle, 
+      description: editDescription,
+      tags: editTags 
+    });
     setEditingId(null);
     setEditTitle("");
     setEditDescription("");
+    setEditTags([]);
     loadMeetings();
   };
 
@@ -107,18 +117,41 @@ export default function MeetingsRoute() {
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             {editingId === meeting.id ? (
-              <Input 
-                value={editTitle} 
-                onChange={e => setEditTitle(e.target.value)} 
-                className="mb-2"
-                placeholder="Meeting title"
-              />
+              <div className="space-y-2">
+                <Input 
+                  value={editTitle} 
+                  onChange={e => setEditTitle(e.target.value)} 
+                  placeholder="Meeting title"
+                />
+                <Input 
+                  value={editDescription} 
+                  onChange={e => setEditDescription(e.target.value)} 
+                  placeholder="Meeting description"
+                />
+                <TagsInput
+                  tags={editTags}
+                  onChange={setEditTags}
+                  placeholder="Add tags..."
+                />
+              </div>
             ) : (
-              <CardTitle className="text-base">
-                <Link to={`/meetings/${meeting.id}`} className="text-primary hover:underline">
-                  {meeting.title}
-                </Link>
-              </CardTitle>
+              <>
+                <CardTitle className="text-base">
+                  <Link to={`/meetings/${meeting.id}`} className="text-primary hover:underline">
+                    {meeting.title}
+                  </Link>
+                </CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">{meeting.description}</p>
+                {meeting.tags && meeting.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {meeting.tags.map((tag, index) => (
+                      <Badge key={index} variant="outline" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
           <DropdownMenu>
@@ -145,30 +178,20 @@ export default function MeetingsRoute() {
       </CardHeader>
       <CardContent className="pt-0">
         {editingId === meeting.id ? (
-          <div className="space-y-3">
-            <Input 
-              value={editDescription} 
-              onChange={e => setEditDescription(e.target.value)} 
-              placeholder="Meeting description"
-            />
-            <div className="flex gap-2">
-              <Button size="sm" onClick={() => saveEdit(meeting.id)} disabled={!editTitle.trim()}>
-                Save
-              </Button>
-              <Button size="sm" variant="secondary" onClick={cancelEdit}>
-                Cancel
-              </Button>
-            </div>
+          <div className="flex gap-2 mt-3">
+            <Button size="sm" onClick={() => saveEdit(meeting.id)} disabled={!editTitle.trim()}>
+              Save
+            </Button>
+            <Button size="sm" variant="secondary" onClick={cancelEdit}>
+              Cancel
+            </Button>
           </div>
         ) : (
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">{meeting.description}</p>
-            <div className="flex items-center justify-between">
-              <MeetingStatusChip status={meeting.status} />
-              <span className="text-xs text-muted-foreground">
-                {new Date(meeting.created_at).toLocaleDateString()}
-              </span>
-            </div>
+          <div className="flex items-center justify-between">
+            <MeetingStatusChip status={meeting.status} />
+            <span className="text-xs text-muted-foreground">
+              {new Date(meeting.created_at).toLocaleDateString()}
+            </span>
           </div>
         )}
       </CardContent>
@@ -214,10 +237,11 @@ export default function MeetingsRoute() {
         <Table className="min-w-full text-sm text-left">
           <TableHeader>
             <TableRow className="bg-muted/60">
-              <TableHead className="w-[300px] font-bold text-foreground px-6 py-3">Title</TableHead>
+              <TableHead className="w-[250px] font-bold text-foreground px-6 py-3">Title</TableHead>
               <TableHead className="font-bold text-foreground px-6 py-3">Description</TableHead>
-              <TableHead className="w-[180px] font-bold text-foreground px-6 py-3">Status</TableHead>
-              <TableHead className="w-[240px] font-bold text-foreground px-6 py-3">Created</TableHead>
+              <TableHead className="w-[200px] font-bold text-foreground px-6 py-3">Tags</TableHead>
+              <TableHead className="w-[140px] font-bold text-foreground px-6 py-3">Status</TableHead>
+              <TableHead className="w-[180px] font-bold text-foreground px-6 py-3">Created</TableHead>
               <TableHead className="w-[80px] text-right font-bold text-foreground px-6 py-3"></TableHead>
             </TableRow>
           </TableHeader>
@@ -231,6 +255,14 @@ export default function MeetingsRoute() {
                     </TableCell>
                     <TableCell className="text-muted-foreground px-6 py-3">
                       <Input value={editDescription} onChange={e => setEditDescription(e.target.value)} className="w-full" />
+                    </TableCell>
+                    <TableCell className="px-6 py-3">
+                      <TagsInput
+                        tags={editTags}
+                        onChange={setEditTags}
+                        placeholder="Add tags..."
+                        className="w-full"
+                      />
                     </TableCell>
                     <TableCell className="px-6 py-3">
                       <MeetingStatusChip status={meeting.status} />
@@ -253,6 +285,24 @@ export default function MeetingsRoute() {
                     </Link>
                     </TableCell>
                     <TableCell className="text-muted-foreground px-6 py-3">{meeting.description}</TableCell>
+                    <TableCell className="px-6 py-3">
+                      {meeting.tags && meeting.tags.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {meeting.tags.slice(0, 3).map((tag, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                          {meeting.tags.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{meeting.tags.length - 3}
+                            </Badge>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">No tags</span>
+                      )}
+                    </TableCell>
                     <TableCell className="px-6 py-3">
                       <MeetingStatusChip status={meeting.status} />
                     </TableCell>
@@ -288,7 +338,7 @@ export default function MeetingsRoute() {
             ))}
             {meetings.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                   No meetings found.
                 </TableCell>
               </TableRow>
@@ -311,6 +361,7 @@ export default function MeetingsRoute() {
             status: "in progress",
             fileUrl: url,
             created_at: new Date().toISOString(),
+            tags: [],
           });
           setIsRecordModalOpen(false);
           loadMeetings();
@@ -332,6 +383,7 @@ export default function MeetingsRoute() {
             status: "in progress",
             fileUrl: url,
             created_at: new Date().toISOString(),
+            tags: [],
           });
           setIsUploadModalOpen(false);
           loadMeetings();

@@ -286,7 +286,7 @@ export default function MeetingsRoute() {
                     </TableCell>
                     <TableCell className="text-muted-foreground px-6 py-3">{meeting.description}</TableCell>
                     <TableCell className="px-6 py-3">
-                      {meeting.tags && meeting.tags.length > 0 ? (
+                      {meeting.tags && meeting.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {meeting.tags.slice(0, 3).map((tag, index) => (
                             <Badge key={index} variant="outline" className="text-xs">
@@ -299,8 +299,6 @@ export default function MeetingsRoute() {
                             </Badge>
                           )}
                         </div>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">No tags</span>
                       )}
                     </TableCell>
                     <TableCell className="px-6 py-3">

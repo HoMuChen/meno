@@ -3,7 +3,7 @@ import { Meeting, listMeetings, addMeeting, updateMeeting, deleteMeeting } from 
 import { useAuth } from "../components/auth";
 import { Link } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/node";
-import { PlusIcon, PencilIcon, MicrophoneIcon, ArrowUpTrayIcon, TrashIcon, EyeIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, PencilIcon, MicrophoneIcon, ArrowUpTrayIcon, TrashIcon, EyeIcon, TagIcon } from "@heroicons/react/24/outline";
 import {
   Table,
   TableHeader,
@@ -44,6 +44,7 @@ export default function MeetingsRoute() {
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingTagsId, setEditingTagsId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -65,7 +66,6 @@ export default function MeetingsRoute() {
     setEditingId(meeting.id);
     setEditTitle(meeting.title);
     setEditDescription(meeting.description);
-    setEditTags(meeting.tags || []);
   };
 
   const cancelEdit = () => {
@@ -78,12 +78,22 @@ export default function MeetingsRoute() {
   const saveEdit = async (id: string) => {
     await updateMeeting(id, { 
       title: editTitle, 
-      description: editDescription,
-      tags: editTags 
+      description: editDescription
     });
     setEditingId(null);
     setEditTitle("");
     setEditDescription("");
+    loadMeetings();
+  };
+
+  const startTagsEdit = (meeting: Meeting) => {
+    setEditingTagsId(meeting.id);
+    setEditTags(meeting.tags || []);
+  };
+
+  const saveTags = async (id: string) => {
+    await updateMeeting(id, { tags: editTags });
+    setEditingTagsId(null);
     setEditTags([]);
     loadMeetings();
   };
@@ -128,11 +138,6 @@ export default function MeetingsRoute() {
                   onChange={e => setEditDescription(e.target.value)} 
                   placeholder="Meeting description"
                 />
-                <TagsInput
-                  tags={editTags}
-                  onChange={setEditTags}
-                  placeholder="Add tags..."
-                />
               </div>
             ) : (
               <Link to={`/meetings/${meeting.id}`} className="block">
@@ -142,15 +147,13 @@ export default function MeetingsRoute() {
                   </span>
                 </CardTitle>
                 <p className="text-sm text-muted-foreground mt-1">{meeting.description}</p>
-                {meeting.tags && meeting.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {meeting.tags.map((tag, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {meeting.tags && meeting.tags.length > 0 && meeting.tags.map((tag, index) => (
+                    <Badge key={index} variant="outline" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
               </Link>
             )}
           </div>
@@ -261,12 +264,49 @@ export default function MeetingsRoute() {
                       <Input value={editDescription} onChange={e => setEditDescription(e.target.value)} className="w-full" />
                     </TableCell>
                     <TableCell className="px-6 py-3">
-                      <TagsInput
-                        tags={editTags}
-                        onChange={setEditTags}
-                        placeholder="Add tags..."
-                        className="w-full"
-                      />
+                      {editingTagsId === meeting.id ? (
+                        <div className="space-y-2">
+                          <TagsInput
+                            tags={editTags}
+                            onChange={setEditTags}
+                            placeholder="Add tags..."
+                            className="w-full"
+                          />
+                          <div className="flex gap-2">
+                            <Button size="sm" onClick={() => saveTags(meeting.id)}>
+                              Save
+                            </Button>
+                            <Button size="sm" variant="secondary" onClick={() => setEditingTagsId(null)}>
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap gap-1">
+                            {meeting.tags && meeting.tags.slice(0, 3).map((tag, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                            {meeting.tags && meeting.tags.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{meeting.tags.length - 3}
+                              </Badge>
+                            )}
+                          </div>
+                          {editingId !== meeting.id && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 w-7 p-0"
+                              onClick={() => startTagsEdit(meeting)}
+                            >
+                              <TagIcon className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell className="px-6 py-3">
                       <MeetingStatusChip status={meeting.status} />
@@ -290,17 +330,46 @@ export default function MeetingsRoute() {
                     </TableCell>
                     <TableCell className="text-muted-foreground px-6 py-3">{meeting.description}</TableCell>
                     <TableCell className="px-6 py-3">
-                      {meeting.tags && meeting.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {meeting.tags.slice(0, 3).map((tag, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                          {meeting.tags.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{meeting.tags.length - 3}
-                            </Badge>
+                      {editingTagsId === meeting.id ? (
+                        <div className="space-y-2">
+                          <TagsInput
+                            tags={editTags}
+                            onChange={setEditTags}
+                            placeholder="Add tags..."
+                            className="w-full"
+                          />
+                          <div className="flex gap-2">
+                            <Button size="sm" onClick={() => saveTags(meeting.id)}>
+                              Save
+                            </Button>
+                            <Button size="sm" variant="secondary" onClick={() => setEditingTagsId(null)}>
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap gap-1">
+                            {meeting.tags && meeting.tags.slice(0, 3).map((tag, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                            {meeting.tags && meeting.tags.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{meeting.tags.length - 3}
+                              </Badge>
+                            )}
+                          </div>
+                          {editingId !== meeting.id && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 w-7 p-0"
+                              onClick={() => startTagsEdit(meeting)}
+                            >
+                              <TagIcon className="h-4 w-4" />
+                            </Button>
                           )}
                         </div>
                       )}

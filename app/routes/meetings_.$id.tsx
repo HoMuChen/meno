@@ -66,7 +66,7 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
   return json({ success: true });
 };
 
-const GeneratingOverlay = ({ type, onRefresh }: { type: 'content' | 'summary', onRefresh: () => void }) => (
+const GeneratingOverlay = ({ type, onRefresh, isRefreshing }: { type: 'content' | 'summary', onRefresh: () => void, isRefreshing: boolean }) => (
   <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-lg">
     <div className="flex items-center gap-3 mb-4">
       <div className="flex space-x-1">
@@ -77,10 +77,10 @@ const GeneratingOverlay = ({ type, onRefresh }: { type: 'content' | 'summary', o
     </div>
     <div className="text-center mb-4">
       <p className="text-sm font-medium text-foreground mb-1">
-        Generating {type}...
+        {isRefreshing ? 'Refreshing...' : `Generating ${type}...`}
       </p>
       <p className="text-xs text-muted-foreground">
-        AI is processing your meeting audio
+        {isRefreshing ? 'Checking for updates' : 'AI is processing your meeting audio'}
       </p>
     </div>
     <Button 
@@ -88,9 +88,19 @@ const GeneratingOverlay = ({ type, onRefresh }: { type: 'content' | 'summary', o
       variant="outline" 
       onClick={onRefresh}
       className="text-xs"
+      disabled={isRefreshing}
     >
-      <ArrowPathIcon className="h-3 w-3 mr-1" />
-      Refresh
+      {isRefreshing ? (
+        <>
+          <ArrowPathIcon className="h-3 w-3 mr-1 animate-spin" />
+          Refreshing...
+        </>
+      ) : (
+        <>
+          <ArrowPathIcon className="h-3 w-3 mr-1" />
+          Refresh
+        </>
+      )}
     </Button>
   </div>
 );
@@ -103,6 +113,7 @@ export default function MeetingDetailPage() {
   const [summaryValue, setSummaryValue] = useState(meeting.summary || "");
   const [summaryEditMode, setSummaryEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState("content");
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const contentChanged = contentValue !== meeting.content;
   const summaryChanged = summaryValue !== (meeting.summary || "");
   const isInProgress = meeting.status === "in progress";
@@ -115,7 +126,12 @@ export default function MeetingDetailPage() {
   }, [meeting.summary]);
 
   const handleRefresh = () => {
+    setIsRefreshing(true);
     navigate(`/meetings/${meeting.id}`, { replace: true });
+    // Reset refreshing state after navigation
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
   };
 
   return (
@@ -258,7 +274,7 @@ export default function MeetingDetailPage() {
               </div>
               <TabsContent value="content" className="h-full">
                 <div className="flex-1 flex flex-col gap-3 md:gap-4 h-full relative">
-                  {isInProgress && <GeneratingOverlay type="content" onRefresh={handleRefresh} />}
+                  {isInProgress && <GeneratingOverlay type="content" onRefresh={handleRefresh} isRefreshing={isRefreshing} />}
                   <Editor value={contentValue} onChange={setContentValue} />
                   <fetcher.Form method="post" className="self-end">
                     <input type="hidden" name="content" value={contentValue} />
@@ -275,7 +291,7 @@ export default function MeetingDetailPage() {
               </TabsContent>
               <TabsContent value="summary" className="h-full">
                 <div className="flex-1 min-h-0 flex flex-col gap-3 md:gap-4 h-full relative">
-                  {isInProgress && <GeneratingOverlay type="summary" onRefresh={handleRefresh} />}
+                  {isInProgress && <GeneratingOverlay type="summary" onRefresh={handleRefresh} isRefreshing={isRefreshing} />}
                   {summaryEditMode ? (
                     <>
                       <Editor value={summaryValue} onChange={setSummaryValue} />

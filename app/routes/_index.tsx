@@ -10,10 +10,7 @@ import { addMeeting } from "../services/meetings";
 import { useAuth } from "../components/auth";
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
-  ];
+  return [{ title: "Home | Meno" }];
 };
 
 export default function Index() {

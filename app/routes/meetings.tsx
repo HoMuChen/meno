@@ -135,11 +135,11 @@ export default function MeetingsRoute() {
                 />
               </div>
             ) : (
-              <>
+              <Link to={`/meetings/${meeting.id}`} className="block">
                 <CardTitle className="text-base">
-                  <Link to={`/meetings/${meeting.id}`} className="text-primary hover:underline">
+                  <span className="text-primary hover:underline">
                     {meeting.title}
-                  </Link>
+                  </span>
                 </CardTitle>
                 <p className="text-sm text-muted-foreground mt-1">{meeting.description}</p>
                 {meeting.tags && meeting.tags.length > 0 && (
@@ -151,29 +151,31 @@ export default function MeetingsRoute() {
                     ))}
                   </div>
                 )}
-              </>
+              </Link>
             )}
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link to={`/meetings/${meeting.id}`}>
-                  <EyeIcon className="h-4 w-4 mr-2" /> View
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => startEdit(meeting)}>
-                <PencilIcon className="h-4 w-4 mr-2" /> Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setDeletingId(meeting.id)}>
-                <TrashIcon className="h-4 w-4 mr-2 text-destructive" /> Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to={`/meetings/${meeting.id}`}>
+                    <EyeIcon className="h-4 w-4 mr-2" /> View
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => startEdit(meeting)}>
+                  <PencilIcon className="h-4 w-4 mr-2" /> Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setDeletingId(meeting.id)}>
+                  <TrashIcon className="h-4 w-4 mr-2 text-destructive" /> Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="pt-0">
@@ -187,12 +189,14 @@ export default function MeetingsRoute() {
             </Button>
           </div>
         ) : (
-          <div className="flex items-center justify-between">
-            <MeetingStatusChip status={meeting.status} />
-            <span className="text-xs text-muted-foreground">
-              {new Date(meeting.created_at).toLocaleDateString()}
-            </span>
-          </div>
+          <Link to={`/meetings/${meeting.id}`} className="block">
+            <div className="flex items-center justify-between">
+              <MeetingStatusChip status={meeting.status} />
+              <span className="text-xs text-muted-foreground">
+                {new Date(meeting.created_at).toLocaleDateString()}
+              </span>
+            </div>
+          </Link>
         )}
       </CardContent>
     </Card>

@@ -144,8 +144,38 @@ export default function MeetingDetailPage() {
         .markdown-content h5 { font-size: 0.875rem; font-weight: 600; margin: 0.75rem 0 0.5rem 0; }
         .markdown-content h6 { font-size: 0.75rem; font-weight: 600; margin: 0.75rem 0 0.5rem 0; }
         .markdown-content p { margin: 0.5rem 0; }
-        .markdown-content ul, .markdown-content ol { margin: 0.5rem 0; padding-left: 1.5rem; }
-        .markdown-content li { margin: 0.25rem 0; }
+        .markdown-content ul { 
+          margin: 0.5rem 0; 
+          padding-left: 1.5rem; 
+          list-style-type: disc;
+        }
+        .markdown-content ol { 
+          margin: 0.5rem 0; 
+          padding-left: 1.5rem; 
+          list-style-type: decimal;
+        }
+        .markdown-content li { 
+          margin: 0.25rem 0;
+          display: list-item;
+        }
+        .markdown-content ul li::marker {
+          color: hsl(var(--muted-foreground));
+        }
+        .markdown-content ol li::marker {
+          color: hsl(var(--muted-foreground));
+        }
+        .markdown-content ul ul {
+          list-style-type: circle;
+        }
+        .markdown-content ul ul ul {
+          list-style-type: square;
+        }
+        .markdown-content ol ol {
+          list-style-type: lower-alpha;
+        }
+        .markdown-content ol ol ol {
+          list-style-type: lower-roman;
+        }
         .markdown-content blockquote { 
           border-left: 4px solid hsl(var(--border)); 
           padding-left: 1rem; 

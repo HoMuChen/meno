@@ -41,24 +41,24 @@ export function DynamicBreadcrumb() {
             
             {/* Desktop: Show full breadcrumb */}
             {pathnames.map((segment, index) => {
-              const isLast = index === pathnames.length - 1;
-              const path = buildPath(index);
-              const title = formatPathSegment(segment);
+            const isLast = index === pathnames.length - 1;
+            const path = buildPath(index);
+            const title = formatPathSegment(segment);
 
-              return (
-                <Fragment key={path}>
+            return (
+              <Fragment key={path}>
                   <BreadcrumbItem className="hidden md:block">
-                    {isLast ? (
+                  {isLast ? (
                       <BreadcrumbPage className="text-sm md:text-base">{title}</BreadcrumbPage>
-                    ) : (
+                  ) : (
                       <BreadcrumbLink href={path} className="text-primary hover:text-primary/80 text-sm md:text-base">
                         {title}
                       </BreadcrumbLink>
-                    )}
-                  </BreadcrumbItem>
+                  )}
+                </BreadcrumbItem>
                   {!isLast && <BreadcrumbSeparator className="hidden md:block" />}
-                </Fragment>
-              );
+              </Fragment>
+            );
             })}
           </>
         )}

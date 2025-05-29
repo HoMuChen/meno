@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../compone
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { useNavigate } from "@remix-run/react";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithGoogle } from "../firebase/auth";
 
 export const meta: MetaFunction = () => [{ title: "Login | Meno" }];
 
@@ -25,9 +25,7 @@ export default function LoginRoute() {
     setLoading(true);
     setError(null);
     try {
-      const { auth } = await import("../firebase");
-      const { signInWithEmailAndPassword } = await import("firebase/auth");
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(email, password);
       navigate("/");
     } catch (err: any) {
       setError(err.message || "Login failed");
@@ -40,9 +38,7 @@ export default function LoginRoute() {
     setLoading(true);
     setError(null);
     try {
-      const { auth } = await import("../firebase");
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      await signInWithGoogle();
       navigate("/");
     } catch (err: any) {
       setError(err.message || "Google login failed");

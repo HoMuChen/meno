@@ -140,7 +140,7 @@ export function AudioRecorderModal({ open, onClose, onUploadSuccess }: AudioReco
             <div className="flex items-center justify-center gap-4 md:gap-6 w-full py-6 md:py-8 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-blue-900/20 rounded-lg">
               {renderSoundWave('left')}
               <div className="relative">
-                <div 
+              <div
                   className="absolute inset-0 rounded-full animate-pulse"
                   style={{
                     background: `radial-gradient(circle, rgba(59, 130, 246, ${0.3 + volume * 0.7}) 0%, rgba(147, 51, 234, ${0.2 + volume * 0.5}) 50%, transparent 70%)`,
@@ -154,7 +154,7 @@ export function AudioRecorderModal({ open, onClose, onUploadSuccess }: AudioReco
                     style={{
                       filter: `drop-shadow(0 0 ${4 + volume * 8}px rgba(59, 130, 246, 0.8))`,
                     }}
-                  />
+              />
                 </div>
               </div>
               {renderSoundWave('right')}

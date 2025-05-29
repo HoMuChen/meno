@@ -20,16 +20,11 @@ export function Auth({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let unsubscribe: any;
-    console.log("Auth effect running");
     (async () => {
       try {
-        console.log("Importing firebase...");
         const { auth } = await import("../firebase");
-        console.log("Importing onAuthStateChanged...");
         const { onAuthStateChanged } = await import("firebase/auth");
-        console.log("Registering onAuthStateChanged...");
         unsubscribe = onAuthStateChanged(auth, (user) => {
-          console.log("onAuthStateChanged fired", user);
           setUser(user);
           setLoading(false);
           if (!user) {
@@ -42,13 +37,11 @@ export function Auth({ children }: { children: React.ReactNode }) {
       }
     })();
     return () => {
-      console.log("Auth effect cleanup");
       unsubscribe && unsubscribe();
     };
   }, [navigate]);
 
   if (loading) {
-    console.log("Loading...");
     return <div className="flex items-center justify-center h-screen text-gray-200">Loading...</div>;
   }
 

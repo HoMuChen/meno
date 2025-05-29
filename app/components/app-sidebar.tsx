@@ -2,7 +2,7 @@ import { Calendar, Home, Inbox, Search, Settings, User2 } from "lucide-react"
 import { useAuth } from "./auth"
 import { useNavigate } from "@remix-run/react"
 import { auth } from "../firebase"
-import { signOut } from "firebase/auth"
+import { signOut } from "../firebase/auth"
 
 import {
   Sidebar,
@@ -35,7 +35,7 @@ export function AppSidebar() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await signOut(auth);
+    await signOut();
     navigate("/login");
   };
 
@@ -80,7 +80,7 @@ export function AppSidebar() {
             </div>
             <button
               onClick={handleLogout}
-              className="mt-2 w-full py-1.5 rounded-md bg-gray-200 text-gray-800 text-sm font-medium hover:bg-gray-300 transition"
+              className="mt-2 w-full py-1.5 rounded-md bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300 transition"
             >
               Log out
             </button>

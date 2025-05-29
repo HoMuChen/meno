@@ -23,7 +23,7 @@ import {
 import { AudioRecorderModal } from "../components/audioRecorderModal";
 import { FileUploadModal } from "../components/fileUploadModal";
 import { MeetingStatusChip } from "../components/meetingStatusChip";
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "../components/ui/alert-dialog";
+import { ConfirmationDialog } from "../components/confirmationDialog";
 import { Input } from "../components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
@@ -34,13 +34,10 @@ export const meta: MetaFunction = () => [{ title: "Meetings | Meno" }];
 export default function MeetingsRoute() {
   const { user } = useAuth();
   const [meetings, setMeetings] = useState<Meeting[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editTags, setEditTags] = useState<string[]>([]);
-  const [editStatus, setEditStatus] = useState("");
-  const [editLoading, setEditLoading] = useState(false);
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -60,6 +57,22 @@ export default function MeetingsRoute() {
     } catch (error) {
       console.error("Error loading meetings:", error);
     }
+  };
+
+  const handleAddMeeting = async (url: string) => {
+    if (!user) return;
+    await addMeeting({
+      userId: user.uid,
+      title: "Meeting",
+      description: "Meeting added from audio or file",
+      content: "",
+      summary: "",
+      status: "in progress",
+      fileUrl: url,
+      created_at: new Date().toISOString(),
+      tags: [],
+    });
+    loadMeetings();
   };
 
   const startEdit = (meeting: Meeting) => {
@@ -383,10 +396,9 @@ export default function MeetingsRoute() {
                     <TableCell className="text-right px-6 py-3 rounded-r-xl group-first:rounded-tr-2xl group-last:rounded-br-2xl">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring">
-                            <MoreHorizontal className="h-5 w-5" />
-                            <span className="sr-only">Open menu</span>
-                    </button>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem asChild>
@@ -422,20 +434,8 @@ export default function MeetingsRoute() {
         open={isRecordModalOpen}
         onClose={() => setIsRecordModalOpen(false)}
         onUploadSuccess={async (url: string) => {
-          if (!user) return;
-          await addMeeting({
-            userId: user.uid,
-            title: "Audio Meeting",
-            description: "Recorded audio meeting",
-            content: "",
-            summary: "",
-            status: "in progress",
-            fileUrl: url,
-            created_at: new Date().toISOString(),
-            tags: [],
-          });
+          await handleAddMeeting(url);
           setIsRecordModalOpen(false);
-          loadMeetings();
         }}
       />
 
@@ -444,37 +444,17 @@ export default function MeetingsRoute() {
         onClose={() => setIsUploadModalOpen(false)}
         accept="audio/*"
         onUploadSuccess={async (url: string) => {
-          if (!user) return;
-          await addMeeting({
-            userId: user.uid,
-            title: "Uploaded File Meeting",
-            description: "Meeting with uploaded file",
-            content: "",
-            summary: "",
-            status: "in progress",
-            fileUrl: url,
-            created_at: new Date().toISOString(),
-            tags: [],
-          });
+          await handleAddMeeting(url);
           setIsUploadModalOpen(false);
-          loadMeetings();
         }}
       />
 
-      <AlertDialog open={!!deletingId} onOpenChange={open => { if (!open) setDeletingId(null); }}>
-        <AlertDialogContent className="mx-4 max-w-md">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Meeting</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this meeting? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-            <AlertDialogCancel onClick={() => setDeletingId(null)} className="w-full sm:w-auto">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deletingId && confirmDelete(deletingId)} autoFocus className="w-full sm:w-auto">Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmationDialog
+        open={!!deletingId}
+        onOpenChange={open => { if (!open) setDeletingId(null); }}
+        onConfirm={() => deletingId && confirmDelete(deletingId)}
+        description="Are you sure you want to delete this meeting? This action cannot be undone."
+      />
     </div>
   );
 } 

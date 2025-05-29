@@ -1,6 +1,7 @@
 import { useEffect, useState, createContext, useContext } from "react";
 import { useNavigate } from "@remix-run/react";
-import { User } from "firebase/auth";
+import { User, onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase";
 
 interface AuthContextType {
   user: User | null;
@@ -19,25 +20,16 @@ export function Auth({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let unsubscribe: any;
-    (async () => {
-      try {
-        const { auth } = await import("../firebase");
-        const { onAuthStateChanged } = await import("firebase/auth");
-        unsubscribe = onAuthStateChanged(auth, (user) => {
-          setUser(user);
-          setLoading(false);
-          if (!user) {
-            navigate("/login");
-          }
-        });
-      } catch (e) {
-        console.error("Auth effect error", e);
-        setLoading(false);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+      if (!user) {
+        navigate("/login");
       }
-    })();
+    });
+
     return () => {
-      unsubscribe && unsubscribe();
+      unsubscribe();
     };
   }, [navigate]);
 

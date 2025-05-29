@@ -1,0 +1,89 @@
+.markdown-content {
+  @apply text-foreground w-full h-full text-base text-gray-900 bg-white rounded-md focus:outline-none resize-none;
+  line-height: 1.6;
+}
+
+/* Headings */
+.markdown-content h1 { @apply text-2xl font-bold mt-4 mb-2; }
+.markdown-content h2 { @apply text-xl font-semibold mt-3.5 mb-2; }
+.markdown-content h3 { @apply text-lg font-semibold mt-3 mb-2; }
+.markdown-content h4 { @apply text-base font-semibold mt-3 mb-2; }
+.markdown-content h5 { @apply text-sm font-semibold mt-3 mb-2; }
+.markdown-content h6 { @apply text-xs font-semibold mt-3 mb-2; }
+
+/* Paragraphs and Lists */
+.markdown-content p { @apply my-2; }
+.markdown-content ul { 
+  @apply my-2 pl-6;
+  list-style-type: disc;
+}
+.markdown-content ol { 
+  @apply my-2 pl-6;
+  list-style-type: decimal;
+}
+.markdown-content li { 
+  @apply my-1;
+  display: list-item;
+}
+
+/* Nested Lists */
+.markdown-content ul ul {
+  list-style-type: circle;
+}
+.markdown-content ul ul ul {
+  list-style-type: square;
+}
+.markdown-content ol ol {
+  list-style-type: lower-alpha;
+}
+.markdown-content ol ol ol {
+  list-style-type: lower-roman;
+}
+
+/* List Markers */
+.markdown-content ul li::marker,
+.markdown-content ol li::marker {
+  @apply text-muted-foreground;
+}
+
+/* Blockquotes */
+.markdown-content blockquote { 
+  @apply border-l-4 border-border pl-4 my-4 text-muted-foreground italic;
+}
+
+/* Code */
+.markdown-content code { 
+  @apply bg-muted px-1 py-0.5 rounded text-sm font-mono;
+}
+.markdown-content pre { 
+  @apply bg-muted p-4 rounded-lg overflow-x-auto my-4;
+}
+.markdown-content pre code { 
+  @apply bg-transparent p-0;
+}
+
+/* Links */
+.markdown-content a { 
+  @apply text-primary underline hover:opacity-80;
+}
+
+/* Text Styles */
+.markdown-content strong { @apply font-semibold; }
+.markdown-content em { @apply italic; }
+
+/* Horizontal Rule */
+.markdown-content hr { 
+  @apply border-t border-border my-6;
+}
+
+/* Tables */
+.markdown-content table { 
+  @apply w-full border-collapse my-4;
+}
+.markdown-content th,
+.markdown-content td { 
+  @apply border border-border p-2 text-left;
+}
+.markdown-content th { 
+  @apply bg-muted font-semibold;
+} 

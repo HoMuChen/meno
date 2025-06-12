@@ -1,14 +1,17 @@
-import { Calendar, Home, Inbox, Search, Settings, User2 } from "lucide-react"
+import { User2 } from "lucide-react"
 import { useAuth } from "./auth"
-import { useNavigate } from "@remix-run/react"
+import { useNavigate, Link } from "@remix-run/react"
 import { auth } from "../firebase"
 import { signOut } from "../firebase/auth"
+import { useState, useEffect } from "react"
+import { Meeting, listMeetings } from "../services/meetings"
 
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -16,23 +19,26 @@ import {
   SidebarFooter,
 } from "./ui/sidebar"
 
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "Meetings",
-    url: "/meetings",
-    icon: Calendar,
-  },
-]
-
 export function AppSidebar() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      loadMeetings();
+    }
+  }, [user]);
+
+  const loadMeetings = async () => {
+    if (!user) return;
+    try {
+      const meetingsList = await listMeetings(user.uid);
+      setMeetings(meetingsList);
+    } catch (error) {
+      console.error("Error loading meetings:", error);
+    }
+  };
 
   const handleLogout = async () => {
     await signOut();
@@ -42,22 +48,34 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="px-3 py-4">
-        <h1 className="text-xl md:text-2xl font-bold text-primary">Meno</h1>
+        <Link to="/" className="text-xl md:text-2xl font-bold text-primary hover:text-primary/80 transition-colors">
+          Meno
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
+          <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
+            Meetings
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="text-sm md:text-base">
-                    <a href={item.url}>
-                      <item.icon className="h-4 w-4 md:h-5 md:w-5" />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+            <SidebarMenu className="max-h-[calc(100vh-16rem)] overflow-y-auto">
+              {meetings.length === 0 ? (
+                <div className="px-2 py-2 text-sm text-muted-foreground">
+                  No meetings found
+                </div>
+              ) : (
+                meetings.map((meeting) => (
+                  <SidebarMenuItem key={meeting.id}>
+                    <SidebarMenuButton asChild className="text-sm">
+                      <Link to={`/meetings/${meeting.id}`}>
+                        <span className="truncate" title={meeting.title}>
+                          {meeting.title}
+                        </span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

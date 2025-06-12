@@ -139,15 +139,6 @@ export default function MeetingDetailPage() {
                       <CardTitle className="text-lg md:text-xl break-words">
                         {meeting.title}
                       </CardTitle>
-                      {meeting.tags && meeting.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {meeting.tags.map((tag, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
                     </div>
                     <CardDescription className="text-sm">
                       {meeting.description || "No description"}

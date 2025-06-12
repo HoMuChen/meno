@@ -11,7 +11,6 @@ export type Meeting = {
   status: string;
   fileUrl?: string;
   created_at: string;
-  tags?: string[];
 };
 
 export async function listMeetings(userId: string): Promise<Meeting[]> {

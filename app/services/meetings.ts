@@ -18,10 +18,15 @@ export async function listMeetings(userId: string): Promise<Meeting[]> {
   const meetingsRef = collection(db, "meetings");
   const q = query(meetingsRef, where("userId", "==", userId));
   const querySnapshot = await getDocs(q);
-  const meetings = querySnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Meeting[];
+  const meetings = querySnapshot.docs.map((doc) => {
+    const data = doc.data();
+    // Exclude content and summary fields for better performance
+    const { content, summary, ...meetingData } = data;
+    return {
+      id: doc.id,
+      ...meetingData,
+    };
+  }) as Meeting[];
   return meetings.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 }
 

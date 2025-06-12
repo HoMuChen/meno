@@ -220,11 +220,11 @@ export default function MeetingsRoute() {
 
   return (
     <div className="container mx-auto px-2 md:px-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-4">
+      <div className="flex justify-end mb-4 md:mb-6">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button className="w-full sm:w-auto">
-              <PlusIcon className="h-4 w-4 md:h-5 md:w-5" />
+            <Button className="w-full md:w-auto">
+              <PlusIcon className="h-4 w-4 md:h-5 md:w-5 mr-2" />
               New Meeting
             </Button>
           </DropdownMenuTrigger>

@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD_pdGXww0r4_0oIRMqe0Rnuucio8u3Ris",
-  authDomain: "meno-2287c.firebaseapp.com",
+  authDomain: "app.menowithyou.com",
   projectId: "meno-2287c",
   storageBucket: "meno-2287c.firebasestorage.app",
   messagingSenderId: "796659160806",

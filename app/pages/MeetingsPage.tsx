@@ -27,7 +27,7 @@ import { Input } from "../components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 
 
-export default function HomePage() {
+export default function MeetingsPage() {
   const { user } = useAuth();
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -339,4 +339,4 @@ export default function HomePage() {
       />
     </div>
   );
-} 
+}

@@ -55,16 +55,32 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
-            Meetings
+            Navigation
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="max-h-[calc(100vh-16rem)] overflow-y-auto">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild className="text-sm">
+                  <Link to="/meetings">
+                    <span>All Meetings</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
+            Recent Meetings
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="max-h-[calc(100vh-20rem)] overflow-y-auto">
               {meetings.length === 0 ? (
                 <div className="px-2 py-2 text-sm text-muted-foreground">
                   No meetings found
                 </div>
               ) : (
-                meetings.map((meeting) => (
+                meetings.slice(0, 10).map((meeting) => (
                   <SidebarMenuItem key={meeting.id}>
                     <SidebarMenuButton asChild className="text-sm">
                       <Link to={`/meetings/${meeting.id}`}>

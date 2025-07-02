@@ -1,6 +1,4 @@
-import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Link, useLoaderData, useFetcher, useNavigate } from "@remix-run/react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getMeetingById } from "../services/meetings";
 import { ArrowDownTrayIcon, ArrowPathIcon, TagIcon, PencilIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
@@ -35,28 +33,6 @@ const MarkdownRenderer = ({ content }: { content: string }) => {
   return <div className="markdown-content" dangerouslySetInnerHTML={{ __html: html }} />;
 };
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const { id } = params;
-  if (!id) throw new Response("Not Found", { status: 404 });
-  const meeting = await getMeetingById(id);
-  if (!meeting) throw new Response("Not Found", { status: 404 });
-  return json({ meeting });
-};
-
-export const action = async ({ request, params }: LoaderFunctionArgs) => {
-  if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
-  const { id } = params;
-  if (!id) return new Response("Not Found", { status: 404 });
-  const formData = await request.formData();
-  const content = formData.get("content");
-  const summary = formData.get("summary");
-  const update: any = {};
-  if (typeof content === "string") update.content = content;
-  if (typeof summary === "string") update.summary = summary;
-  if (!Object.keys(update).length) return new Response("No valid fields", { status: 400 });
-  await import("../services/meetings").then(({ updateMeeting }) => updateMeeting(id, update));
-  return json({ success: true });
-};
 
 const GeneratingOverlay = ({ type, onRefresh, isRefreshing }: { type: 'content' | 'summary', onRefresh: () => void, isRefreshing: boolean }) => (
   <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-lg">
@@ -98,33 +74,80 @@ const GeneratingOverlay = ({ type, onRefresh, isRefreshing }: { type: 'content' 
 );
 
 export default function MeetingDetailPage() {
-  const { meeting } = useLoaderData<typeof loader>();
-  const fetcher = useFetcher();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [contentValue, setContentValue] = useState(meeting.content);
-  const [summaryValue, setSummaryValue] = useState(meeting.summary || "");
+  const [meeting, setMeeting] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [contentValue, setContentValue] = useState("");
+  const [summaryValue, setSummaryValue] = useState("");
   const [summaryEditMode, setSummaryEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState("content");
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const contentChanged = contentValue !== meeting.content;
-  const summaryChanged = summaryValue !== (meeting.summary || "");
-  const isInProgress = meeting.status === "in progress";
+  const [saving, setSaving] = useState(false);
+  
+  const contentChanged = meeting && contentValue !== meeting.content;
+  const summaryChanged = meeting && summaryValue !== (meeting.summary || "");
+  const isInProgress = meeting && meeting.status === "in progress";
 
   React.useEffect(() => {
-    setContentValue(meeting.content);
-  }, [meeting.content]);
+    if (id) {
+      loadMeeting();
+    }
+  }, [id]);
+  
   React.useEffect(() => {
-    setSummaryValue(meeting.summary || "");
-  }, [meeting.summary]);
+    if (meeting) {
+      setContentValue(meeting.content || "");
+      setSummaryValue(meeting.summary || "");
+    }
+  }, [meeting]);
+  
+  const loadMeeting = async () => {
+    if (!id) return;
+    try {
+      setLoading(true);
+      const meetingData = await getMeetingById(id);
+      if (meetingData) {
+        setMeeting(meetingData);
+      } else {
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Error loading meeting:", error);
+      navigate("/");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const saveMeeting = async (updates: any) => {
+    if (!id) return;
+    try {
+      setSaving(true);
+      await import("../services/meetings").then(({ updateMeeting }) => updateMeeting(id, updates));
+      await loadMeeting();
+    } catch (error) {
+      console.error("Error saving meeting:", error);
+    } finally {
+      setSaving(false);
+    }
+  };
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setIsRefreshing(true);
-    navigate(`/meetings/${meeting.id}`, { replace: true });
-    // Reset refreshing state after navigation
+    await loadMeeting();
     setTimeout(() => {
       setIsRefreshing(false);
     }, 1000);
   };
+  
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+  
+  if (!meeting) {
+    return <div className="flex items-center justify-center h-screen">Meeting not found</div>;
+  }
 
   return (
     <>
@@ -194,17 +217,14 @@ export default function MeetingDetailPage() {
                 <div className="flex-1 flex flex-col gap-3 md:gap-4 h-full relative">
                   {isInProgress && <GeneratingOverlay type="content" onRefresh={handleRefresh} isRefreshing={isRefreshing} />}
                   <Editor value={contentValue} onChange={setContentValue} />
-                  <fetcher.Form method="post" className="self-end">
-                    <input type="hidden" name="content" value={contentValue} />
-                    <Button
-                      type="submit"
-                      disabled={contentValue === meeting.content || fetcher.state === 'submitting' || isInProgress}
-                      size="sm"
-                      className="text-sm"
-                    >
-                      {fetcher.state === 'submitting' ? 'Saving...' : 'Save'}
-                    </Button>
-                  </fetcher.Form>
+                  <Button
+                    onClick={() => saveMeeting({ content: contentValue })}
+                    disabled={!contentChanged || saving || isInProgress}
+                    size="sm"
+                    className="text-sm"
+                  >
+                    {saving ? 'Saving...' : 'Save'}
+                  </Button>
                 </div>
               </TabsContent>
               <TabsContent value="summary" className="h-full">
@@ -213,17 +233,14 @@ export default function MeetingDetailPage() {
                   {summaryEditMode ? (
                     <>
                       <Editor value={summaryValue} onChange={setSummaryValue} />
-                      <fetcher.Form method="post" className="self-end">
-                        <input type="hidden" name="summary" value={summaryValue} />
-                        <Button
-                          type="submit"
-                          disabled={!summaryChanged || fetcher.state === 'submitting' || isInProgress}
-                          size="sm"
-                          className="text-sm"
-                        >
-                          {fetcher.state === 'submitting' ? 'Saving...' : 'Save'}
-                        </Button>
-                      </fetcher.Form>
+                      <Button
+                        onClick={() => saveMeeting({ summary: summaryValue })}
+                        disabled={!summaryChanged || saving || isInProgress}
+                        size="sm"
+                        className="text-sm"
+                      >
+                        {saving ? 'Saving...' : 'Save'}
+                      </Button>
                     </>
                   ) : (
                     <div className="flex-1 min-h-0 h-full px-4 py-2">

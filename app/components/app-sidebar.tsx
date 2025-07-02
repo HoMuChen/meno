@@ -1,6 +1,6 @@
 import { User2 } from "lucide-react"
 import { useAuth } from "./auth"
-import { useNavigate, Link } from "@remix-run/react"
+import { useNavigate, Link } from "react-router-dom"
 import { auth } from "../firebase"
 import { signOut } from "../firebase/auth"
 import { useState, useEffect } from "react"

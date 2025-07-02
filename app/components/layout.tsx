@@ -1,10 +1,4 @@
-import {
-  Links,
-  Meta,
-  Scripts,
-  ScrollRestoration,
-  useLocation,
-} from "@remix-run/react";
+import { useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "./ui/sidebar";
 import { Separator } from "./ui/separator";
 import { DynamicBreadcrumb } from "./dynamic-breadcrumb";
@@ -18,13 +12,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const isMeetingDetailPage = location.pathname.match(/^\/meetings\/[^\/]+$/);
 
   return (
-    <html lang="en" className="h-full bg-background">
-      <head>
-        <Meta />
-        <Links />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </head>
-      <body className="h-full flex bg-background text-foreground">
+    <div className="h-full flex bg-background text-foreground">
         <Auth>
           <SidebarProvider>
             <AppSidebar />
@@ -46,9 +34,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </main>
           </SidebarProvider>
         </Auth>
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
+    </div>
   );
 }

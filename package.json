@@ -4,10 +4,10 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "remix vite:build",
-    "dev": "remix vite:dev",
+    "build": "vite build",
+    "dev": "vite",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
-    "start": "remix-serve ./build/server/index.js",
+    "preview": "vite preview",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -19,9 +19,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-tooltip": "^1.2.7",
-    "@remix-run/node": "^2.16.6",
-    "@remix-run/react": "^2.16.6",
-    "@remix-run/serve": "^2.16.6",
+    "react-router-dom": "^6.8.1",
     "@types/markdown-it": "^14.1.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -35,7 +33,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@remix-run/dev": "^2.16.6",
+    "@types/node": "^18.15.0",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
@@ -51,7 +49,7 @@
     "tailwindcss": "^3.4.4",
     "typescript": "^5.1.6",
     "vite": "^6.0.0",
-    "vite-tsconfig-paths": "^4.2.1"
+    "@vitejs/plugin-react": "^4.0.3"
   },
   "engines": {
     "node": ">=20.0.0"

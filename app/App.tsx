@@ -1,0 +1,17 @@
+import { Routes, Route } from 'react-router-dom'
+import { Layout } from './components/layout'
+import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
+import MeetingDetailPage from './pages/MeetingDetailPage'
+
+export default function App() {
+  return (
+    <Layout>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/meetings/:id" element={<MeetingDetailPage />} />
+      </Routes>
+    </Layout>
+  )
+}

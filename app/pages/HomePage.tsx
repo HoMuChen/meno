@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Meeting, listMeetings, addMeeting, updateMeeting, deleteMeeting } from "../services/meetings";
 import { useAuth } from "../components/auth";
-import { Link } from "@remix-run/react";
-import type { MetaFunction } from "@remix-run/node";
+import { Link } from "react-router-dom";
 import { PlusIcon, PencilIcon, MicrophoneIcon, ArrowUpTrayIcon, TrashIcon, EyeIcon } from "@heroicons/react/24/outline";
 import {
   Table,
@@ -27,9 +26,8 @@ import { ConfirmationDialog } from "../components/confirmationDialog";
 import { Input } from "../components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 
-export const meta: MetaFunction = () => [{ title: "Meetings | Meno" }];
 
-export default function MeetingsRoute() {
+export default function HomePage() {
   const { user } = useAuth();
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);

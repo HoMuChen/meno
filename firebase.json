@@ -4,12 +4,12 @@
     "source": "functions"
   },
   "hosting": {
-    "public": "public",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "/build/**"],
+    "public": "dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
         "source": "**",
-        "function": "app"
+        "destination": "/index.html"
       }
     ]
   },

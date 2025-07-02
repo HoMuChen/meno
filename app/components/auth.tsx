@@ -1,5 +1,5 @@
 import { useEffect, useState, createContext, useContext } from "react";
-import { useNavigate } from "@remix-run/react";
+import { useNavigate } from "react-router-dom";
 import { User, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
 

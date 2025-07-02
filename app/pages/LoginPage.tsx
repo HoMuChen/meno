@@ -1,14 +1,11 @@
-import type { MetaFunction } from "@remix-run/node";
 import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
-import { useNavigate } from "@remix-run/react";
+import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword, signInWithGoogle } from "../firebase/auth";
 
-export const meta: MetaFunction = () => [{ title: "Login | Meno" }];
-
-export default function LoginRoute() {
+export default function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

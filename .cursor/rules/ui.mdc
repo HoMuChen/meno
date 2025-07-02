@@ -1,0 +1,73 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# UI Rules
+
+## Technology Stack
+
+- **Component Library:** All UI components are built using [shadcn/ui](https://ui.shadcn.com/) for accessible, composable, and customizable React primitives.
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) is used for all utility-first styling, ensuring consistency and rapid development.
+
+## General Best Practices
+
+- **Reusability:** Prefer shadcn/ui components (e.g., `Button`, `Input`, `Dialog`, `DropdownMenu`) for all forms, dialogs, and interactive elements to ensure accessibility and design consistency.
+- **Utility Classes:** Use Tailwind utility classes for layout, spacing, color, and typography. Avoid custom CSS unless absolutely necessary.
+- **Responsiveness:** Use Tailwind's responsive utilities (`sm:`, `md:`, `lg:`, etc.) to ensure layouts adapt gracefully to all screen sizes.
+- **Dark/Light Mode:** Default to light mode (`bg-white`, `text-zinc-900`), but structure components so that dark mode can be added easily in the future if needed.
+
+## Layout & Structure
+
+- **Containers:** Use rounded corners (`rounded-2xl`), subtle borders (`border-zinc-200`), and shadows (`shadow-xl`) for modals, cards, and dialogs.
+- **Spacing:** Use Tailwind's spacing utilities (`p-8`, `mb-4`, `gap-4`, etc.) for consistent internal and external spacing.
+
+## Typography
+
+- **Headings:** Use bold, left-aligned headings (`font-bold`, `text-2xl`) for modal and section titles.
+- **Descriptions:** Use lighter, left-aligned text (`text-zinc-500`) for subtitles and descriptions.
+- **Labels:** Use `text-zinc-800` for form labels, and always associate them with their inputs for accessibility.
+- **Body Text:** Use `text-zinc-900` for main content on light backgrounds.
+
+## Forms & Inputs
+
+- **Inputs:** Use shadcn/ui `Input` with Tailwind classes for a white background, light border (`border-zinc-200`), dark text, and subtle placeholder (`placeholder:text-zinc-400`).
+- **Form Layout:** Stack fields vertically with clear labels and adequate spacing.
+
+## Buttons
+
+- **Primary Actions:** Use shadcn/ui `Button` with a light background (`bg-zinc-100`), dark text, and full width for main actions. Add hover states (`hover:bg-zinc-200`).
+- **Secondary/Cancel Actions:** Use a white background, light border, and dark text (`text-zinc-700`), with a hover effect (`hover:bg-zinc-100`).
+- **Destructive Actions:** Use red text or icons for delete actions, and always show a confirmation dialog before destructive changes.
+
+## Modals & Dialogs
+
+- **Use shadcn/ui `Dialog` components** for all modal interactions.
+- **Background:** White (`bg-white`), with a subtle border and shadow.
+- **Padding:** Use generous internal padding (`p-8` or similar).
+- **Header:** Title and description are left-aligned and spaced apart from the form/content.
+- **Footer:** Action buttons are stacked vertically with spacing.
+
+## Sidebar & Navigation
+
+- **Sidebar:** 
+  - Project names are bold to distinguish from meeting names.
+  - Meetings are listed under their respective projects, indented for hierarchy.
+  - Use icons (e.g., folder, file) for visual cues.
+- **Dropdown Menus:** 
+  - Use shadcn/ui `DropdownMenu` and submenu components.
+  - Menus appear below and left-aligned to the trigger button.
+  - Use submenus for actions like "Move to Project".
+  - Destructive actions (like "Delete") are styled in red.
+
+## Accessibility & Responsiveness
+
+- **Focus States:** All interactive elements (buttons, inputs) have clear focus styles for accessibility, as provided by shadcn/ui and Tailwind.
+- **Keyboard Navigation:** Ensure all dialogs, dropdowns, and forms are fully keyboard accessible.
+- **Responsive Design:** Use Tailwind's responsive utilities to ensure usability on both desktop and mobile.
+
+---
+
+**Note:**  
+Always refer to the [shadcn/ui documentation](https://ui.shadcn.com/docs) and [Tailwind CSS documentation](https://tailwindcss.com/docs) for best practices, accessibility guidelines, and component usage examples. 

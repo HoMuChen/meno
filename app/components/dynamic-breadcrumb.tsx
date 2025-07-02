@@ -1,4 +1,4 @@
-import { useLocation } from "@remix-run/react";
+import { useLocation } from "react-router-dom";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from "./ui/breadcrumb";
 import { Fragment } from "react/jsx-runtime";
 

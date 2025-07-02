@@ -1,10 +1,10 @@
-import { User2 } from "lucide-react"
+import { User2, Clock } from "lucide-react"
 import { useAuth } from "./auth"
 import { useNavigate, Link } from "react-router-dom"
-import { auth } from "../firebase"
 import { signOut } from "../firebase/auth"
-import { useState, useEffect } from "react"
-import { Meeting, listMeetings } from "../services/meetings"
+import { useState, useEffect, useCallback } from "react"
+import { getMonthlyUsageSum, getCurrentMonth } from "../services/usage"
+import { Progress } from "./ui/progress"
 
 import {
   Sidebar,
@@ -22,23 +22,25 @@ import {
 export function AppSidebar() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [monthlyUsage, setMonthlyUsage] = useState<number>(0);
+  const monthlyLimit = 300;
 
-  useEffect(() => {
-    if (user) {
-      loadMeetings();
+  const loadMonthlyUsage = useCallback(async () => {
+    if (!user) return;
+    try {
+      const currentMonth = getCurrentMonth();
+      const usage = await getMonthlyUsageSum(user.uid, currentMonth);
+      setMonthlyUsage(usage);
+    } catch (error) {
+      console.error("Error loading monthly usage:", error);
     }
   }, [user]);
 
-  const loadMeetings = async () => {
-    if (!user) return;
-    try {
-      const meetingsList = await listMeetings(user.uid);
-      setMeetings(meetingsList);
-    } catch (error) {
-      console.error("Error loading meetings:", error);
+  useEffect(() => {
+    if (user) {
+      loadMonthlyUsage();
     }
-  };
+  }, [user, loadMonthlyUsage]);
 
   const handleLogout = async () => {
     await signOut();
@@ -62,43 +64,36 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild className="text-sm">
                   <Link to="/meetings">
-                    <span>All Meetings</span>
+                    <span>Meetings</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
-            Recent Meetings
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="max-h-[calc(100vh-20rem)] overflow-y-auto">
-              {meetings.length === 0 ? (
-                <div className="px-2 py-2 text-sm text-muted-foreground">
-                  No meetings found
-                </div>
-              ) : (
-                meetings.slice(0, 10).map((meeting) => (
-                  <SidebarMenuItem key={meeting.id}>
-                    <SidebarMenuButton asChild className="text-sm">
-                      <Link to={`/meetings/${meeting.id}`}>
-                        <span className="truncate" title={meeting.title}>
-                          {meeting.title}
-                        </span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))
-              )}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="px-3 py-4">
         {user && (
-          <div className="flex flex-col gap-2 w-full">
+          <div className="flex flex-col gap-3 w-full">
+            {/* Monthly Usage Display */}
+            <div className="p-3 rounded-md bg-muted/40">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">Usage This Month</span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>{monthlyUsage} / {monthlyLimit} minutes</span>
+                  <span className="text-muted-foreground">{getCurrentMonth()}</span>
+                </div>
+                <Progress 
+                  value={(monthlyUsage / monthlyLimit) * 100} 
+                  className="h-2"
+                />
+              </div>
+            </div>
+
+            {/* User Profile Section */}
             <div className="flex items-center gap-3 p-2 rounded-md bg-muted/40">
               {user.photoURL ? (
                 <img src={user.photoURL} alt="avatar" className="w-9 h-9 rounded-full object-cover border" />
@@ -114,7 +109,7 @@ export function AppSidebar() {
             </div>
             <button
               onClick={handleLogout}
-              className="mt-2 w-full py-1.5 rounded-md bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300 transition"
+              className="w-full py-1.5 rounded-md bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300 transition"
             >
               Log out
             </button>

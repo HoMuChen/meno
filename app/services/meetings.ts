@@ -1,4 +1,4 @@
-import { collection, getDocs, addDoc, updateDoc, doc, getDoc, query, where, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, doc, getDoc, query, where, deleteDoc, orderBy, limit, startAfter, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 
 export type Meeting = {
@@ -27,6 +27,63 @@ export async function listMeetings(userId: string): Promise<Meeting[]> {
     };
   }) as Meeting[];
   return meetings.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+}
+
+export type PaginatedMeetings = {
+  meetings: Meeting[];
+  hasMore: boolean;
+  lastDoc?: QueryDocumentSnapshot<DocumentData>;
+};
+
+export async function listMeetingsPaginated(
+  userId: string,
+  pageSize: number = 10,
+  lastDoc?: QueryDocumentSnapshot<DocumentData>
+): Promise<PaginatedMeetings> {
+  const meetingsRef = collection(db, "meetings");
+  let q = query(
+    meetingsRef,
+    where("userId", "==", userId),
+    limit(pageSize + 1) // Get one extra to check if there's more
+  );
+
+  if (lastDoc) {
+    q = query(
+      meetingsRef,
+      where("userId", "==", userId),
+      startAfter(lastDoc),
+      limit(pageSize + 1)
+    );
+  }
+
+  const querySnapshot = await getDocs(q);
+  const docs = querySnapshot.docs;
+  const hasMore = docs.length > pageSize;
+  
+  // Sort by created_at desc client-side
+  const sortedDocs = docs.sort((a, b) => {
+    const aCreated = a.data().created_at;
+    const bCreated = b.data().created_at;
+    return new Date(bCreated).getTime() - new Date(aCreated).getTime();
+  });
+  
+  const meetings = sortedDocs.slice(0, pageSize).map((doc) => {
+    const data = doc.data();
+    // Exclude content and summary fields for better performance
+    const { content, summary, ...meetingData } = data;
+    return {
+      id: doc.id,
+      content: "", // Provide empty content for list view
+      summary: summary || "", // Provide empty summary or existing value
+      ...meetingData,
+    };
+  }) as Meeting[];
+
+  return {
+    meetings,
+    hasMore,
+    lastDoc: hasMore ? sortedDocs[pageSize - 1] : undefined,
+  };
 }
 
 export async function addMeeting(meeting: Omit<Meeting, "id">): Promise<Meeting> {

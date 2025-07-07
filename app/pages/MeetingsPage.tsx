@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Meeting, listMeetings, addMeeting, updateMeeting, deleteMeeting } from "../services/meetings";
+import { Meeting, listMeetings, addMeeting, updateMeeting, deleteMeeting, listMeetingsPaginated, PaginatedMeetings } from "../services/meetings";
 import { useAuth } from "../components/auth";
 import { Link } from "react-router-dom";
-import { PlusIcon, PencilIcon, MicrophoneIcon, ArrowUpTrayIcon, TrashIcon, EyeIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, PencilIcon, MicrophoneIcon, ArrowUpTrayIcon, TrashIcon, EyeIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import {
   Table,
   TableHeader,
@@ -30,6 +30,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 export default function MeetingsPage() {
   const { user } = useAuth();
   const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [paginationData, setPaginationData] = useState<PaginatedMeetings | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
@@ -46,12 +50,50 @@ export default function MeetingsPage() {
   const loadMeetings = async () => {
     if (!user) return;
     try {
-      const meetingsList = await listMeetings(user.uid);
-      setMeetings(meetingsList);
+      setIsLoading(true);
+      const result = await listMeetingsPaginated(user.uid, pageSize);
+      setPaginationData(result);
+      setMeetings(result.meetings);
+      setCurrentPage(1);
     } catch (error) {
       console.error("Error loading meetings:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  const loadNextPage = async () => {
+    if (!user || !paginationData?.hasMore || isLoading) return;
+    try {
+      setIsLoading(true);
+      const result = await listMeetingsPaginated(user.uid, pageSize, paginationData.lastDoc);
+      setPaginationData(result);
+      setMeetings(result.meetings);
+      setCurrentPage(prev => prev + 1);
+    } catch (error) {
+      console.error("Error loading next page:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadPreviousPage = async () => {
+    if (!user || currentPage <= 1 || isLoading) return;
+    try {
+      setIsLoading(true);
+      // For previous page, we need to reload from the beginning
+      // This is a limitation of Firestore pagination
+      const result = await listMeetingsPaginated(user.uid, pageSize);
+      setPaginationData(result);
+      setMeetings(result.meetings);
+      setCurrentPage(1);
+    } catch (error) {
+      console.error("Error loading previous page:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   const handleAddMeeting = async (url: string) => {
     if (!user) return;
@@ -310,6 +352,34 @@ export default function MeetingsPage() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex justify-between items-center mt-6 px-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={loadPreviousPage}
+          disabled={currentPage <= 1 || isLoading}
+        >
+          <ChevronLeftIcon className="h-4 w-4 mr-2" />
+          Previous
+        </Button>
+        
+        <span className="text-sm text-muted-foreground">
+          Page {currentPage}
+          {isLoading && " (Loading...)"}
+        </span>
+        
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={loadNextPage}
+          disabled={!paginationData?.hasMore || isLoading}
+        >
+          Next
+          <ChevronRightIcon className="h-4 w-4 ml-2" />
+        </Button>
       </div>
 
       <AudioRecorderModal

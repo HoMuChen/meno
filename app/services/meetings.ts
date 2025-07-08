@@ -10,6 +10,7 @@ export type Meeting = {
   summary?: string;
   status: string;
   fileUrl?: string;
+  projectId?: string;
   created_at: string;
 };
 
@@ -106,4 +107,23 @@ export async function getMeetingById(id: string): Promise<Meeting | null> {
 export async function deleteMeeting(id: string): Promise<void> {
   const meetingRef = doc(db, "meetings", id);
   await deleteDoc(meetingRef);
+}
+
+export async function listMeetingsByProject(projectId: string): Promise<Meeting[]> {
+  const meetingsRef = collection(db, "meetings");
+  const q = query(
+    meetingsRef, 
+    where("projectId", "==", projectId)
+  );
+  const querySnapshot = await getDocs(q);
+  const meetings = querySnapshot.docs.map((doc) => {
+    const data = doc.data();
+    // Exclude content and summary fields for better performance
+    const { content, summary, ...meetingData } = data;
+    return {
+      id: doc.id,
+      ...meetingData,
+    };
+  }) as Meeting[];
+  return meetings;
 } 

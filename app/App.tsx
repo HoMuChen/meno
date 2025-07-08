@@ -5,6 +5,7 @@ import MeetingsPage from './pages/MeetingsPage'
 import LoginPage from './pages/LoginPage'
 import MeetingDetailPage from './pages/MeetingDetailPage'
 import ProjectsPage from './pages/ProjectsPage'
+import ProjectDetailPage from './pages/ProjectDetailPage'
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/" element={<IndexPage />} />
         <Route path="/meetings" element={<MeetingsPage />} />
         <Route path="/projects" element={<ProjectsPage />} />
+        <Route path="/projects/:id" element={<ProjectDetailPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/meetings/:id" element={<MeetingDetailPage />} />
       </Routes>

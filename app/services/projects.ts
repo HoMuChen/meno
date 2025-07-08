@@ -1,4 +1,4 @@
-import { collection, getDocs, addDoc, doc, getDoc, query, where, orderBy } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, doc, getDoc, query, where, orderBy } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 
 export type Project = {
@@ -12,6 +12,11 @@ export type Project = {
 export type CreateProjectData = {
   name: string;
   description: string;
+};
+
+export type UpdateProjectData = {
+  name?: string;
+  description?: string;
 };
 
 export async function listProjects(userId: string): Promise<Project[]> {
@@ -53,4 +58,18 @@ export async function getProject(projectId: string): Promise<Project | null> {
   }
   
   return null;
+}
+
+export async function updateProject(projectId: string, updates: UpdateProjectData): Promise<void> {
+  const projectRef = doc(db, "projects", projectId);
+  const updateData: any = {};
+  
+  if (updates.name !== undefined) {
+    updateData.name = updates.name;
+  }
+  if (updates.description !== undefined) {
+    updateData.description = updates.description;
+  }
+  
+  await updateDoc(projectRef, updateData);
 }

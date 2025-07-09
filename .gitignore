@@ -107,6 +107,7 @@ firestore-debug.log*
 ui-debug.log*
 meno-2287c-firebase-adminsdk-fbsvc-bdb6a13c57.json
 *-firebase-adminsdk-*.json
+functions/
 
 # Temporary files
 tmp/
